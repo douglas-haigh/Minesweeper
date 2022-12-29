@@ -1,4 +1,6 @@
-// import Mine 
+
+import React from "react";
+
 
 export class Square {  
     private _hasBomb: boolean;
@@ -15,41 +17,39 @@ export class Square {
     }
 }
 
-export class Minefield {
-    height: number;
-    width: number;
+export class Minefield extends React.Component {
     field: Square[][] = [];
-
-    constructor(pHeight:number, pWidth: number ) { 
-        this.height = pHeight;
-        this.width = pWidth; 
-        for (let col = 0; col < this.width; col++) {
+    constructor(props: {height:number, width: number} ) { 
+        super(props);
+        // this.height = props.height;
+        // this.width = props.width; 
+        for (let col = 0; col < props.width; col++) {
             this.field.push([]);
-            for (let row = 0; row < this.height; row++) {
+            for (let row = 0; row < props.height; row++) {
                 this.field[col].push(new Square(false));
             }
         }
     }
+    render() {
+        return( 
+            <div className="minefield"> 
+                    {this.field.map((col) => {
+                        return (
+                            <div>
+                                {col.map(() => {
+                                    return <p> M </p>;
+                                })}
+                                
+                            </div>
+                            )
+                        })}
+                </div>
+                )
+        }
+
 }
 
-export const MinefieldCreator = (props: {height: number, width: number}): any => {
-    const minefield = new Minefield(props.height,props.width);
-    console.log(props.width);
-    return( 
-        <div className="minefield"> 
-                {minefield.field.map((col) => {
-                    return (
-                        <div>
-                            {col.map(() => {
-                                return <p> M </p>;
-                            })}
-                            
-                        </div>
-                        )
-                    })}
-            </div>
-            )
-    }
+
 
 
    

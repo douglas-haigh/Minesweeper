@@ -16,8 +16,6 @@ root.render(
   </React.StrictMode>
 );
 
-const beepboop = new Minefield(9,9);
-console.log(beepboop.field);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
