@@ -7,7 +7,7 @@ function range(start:number, end:number):number[] {
         ans.push(i);
     }
     return ans;
-}
+};
 
 export class Square {  
     private _hasBomb: boolean;
@@ -37,8 +37,8 @@ export class Minefield {
     width: number;
     mines: number;
     field: Square[][] = [];
-    edges: Square[] = [];
-    corners: Square[] = [this.field[0][0]];
+    // edges: Square[] = [];
+    // corners: Square[] = [this.field[0][0]];
 
 
     constructor(pHeight:number, pWidth: number, pMines:number) { 
@@ -51,24 +51,59 @@ export class Minefield {
                 this.field[col].push(new Square(false));
             }
         }
-        this.corners.push(this.field[0][this.height], this.field[this.width][0], this.field[this.width][this.height]);
-        for (let sq of this.field[0]) {
-            this.edges.push(sq)
-        } 
-        for (let sq of this.field[this.width]) {
-            this.edges.push(sq)
-        } 
-        for (let i=0;i<this.width;i++) {
-            this.edges.push(this.field[i][0]);
-            this.edges.push(this.field[i][this.height]);
-        }
+        // this.corners.push(this.field[0][this.height], this.field[this.width][0], this.field[this.width][this.height]);
+        // for (let sq of this.field[0]) {
+        //     this.edges.push(sq)
+        // } 
+        // for (let sq of this.field[this.width]) {
+        //     this.edges.push(sq)
+        // } 
+        // for (let i=0;i<this.width;i++) {
+        //     this.edges.push(this.field[i][0]);
+        //     this.edges.push(this.field[i][this.height]);
+        // }
     }
+
+    getAdjacentSquares(squareNumber: number[]): Square[] { 
+        const col = squareNumber[0];
+        const row = squareNumber[1];
     
-    getAdjacentSquares(squareNumber:number[]): void { 
-        const square = this.field[squareNumber[0]][squareNumber[1]];
+        let adjacentSquares: Square[] = [];
+        
+        if (row > 0) {
+            adjacentSquares.push(this.field[row - 1][col]);
+          }
 
+          if (row < this.field.length - 1) {
+            adjacentSquares.push(this.field[row + 1][col]);
+          }
 
+          if (col > 0) {
+            adjacentSquares.push(this.field[row][col - 1]);
+          }
+
+          if (col < this.field[row].length - 1) {
+            adjacentSquares.push(this.field[row][col + 1]);
+          }
+
+          if (row > 0 && col > 0) {
+            adjacentSquares.push(this.field[row - 1][col - 1]);
+          }
+
+          if (row > 0 && col < this.field[row].length - 1) {
+            adjacentSquares.push(this.field[row - 1][col + 1]);
+          }
+
+          if (row < this.field.length - 1 && col > 0) {
+            adjacentSquares.push(this.field[row + 1][col - 1]);
+          }
+
+          if (row < this.field.length - 1 && col < this.field[row].length - 1) {
+            adjacentSquares.push(this.field[row + 1][col + 1]);
+          }
+          return adjacentSquares;
     }
+
     revealSquare(squareNumber:number[]): void {
         // const squareElement:HTMLElement = document.getElementById(squareNumber.toString());
         const square:Square = this.field[squareNumber[0]][squareNumber[1]];
@@ -80,30 +115,29 @@ export class Minefield {
     }
 }
 
-export const RenderMinefield = (props: {minefield: Minefield}) => {
-
-    const totalSquaresArray = range(0, minefield.height * minefield.width);
-
-    return (
-        <div className="minefield">
-            {totalSquaresArray.map((sq) => { 
-                const id = sq.toString();
+export const RenderMinefield = ({minefield}: {minefield: Minefield}) => {
+    return  (
+        <div className="minefield"> 
+            {minefield.field.map((col) => {
                 return (
-                    <button id={id} className="square-hidden" onClick={minefield.revealSquare()}>  </button>
-                )
-            })}
+                    <div>
+                        {col.map((row) => {
+                            const coordinate: number[] = [minefield.field.indexOf(col),col.indexOf(row)];
+                            const id: string = coordinate.toString();
+                            return (
+                                <button id={id} className="square-hidden" onClick={() => handleClick(coordinate)}>  </button>
+                            )
+                        })}
+                    </div>
+                    )
+                })}
         </div>
-    )
-    }
+    ) 
+}
+
+function handleClick(sq:number[]) {
+    console.log(sq);
+}
 
 
-// const handleClick = () => {
-//     console.log("click");
-//     // analyseClick() - game logic
-//     // revealSquare - UI effects.
-    
-// }
-  
 
-    
-// }
