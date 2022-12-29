@@ -1,7 +1,11 @@
 // import Mine 
 
 export class Square {  
-    private _hasBomb: boolean = false;
+    private _hasBomb: boolean;
+
+    constructor(pHasBomb: boolean) { 
+        this._hasBomb = pHasBomb;
+    }
 
     get hasBomb(): boolean { 
         return this._hasBomb;
@@ -14,18 +18,39 @@ export class Square {
 export class Minefield {
     height: number;
     width: number;
-    field: Square[][];
+    field: Square[][] = [];
 
     constructor(pHeight:number, pWidth: number ) { 
         this.height = pHeight;
-        this.width = pWidth;
-        this.field = new Array(this.width) 
+        this.width = pWidth; 
         for (let col = 0; col < this.width; col++) {
+            this.field.push([]);
             for (let row = 0; row < this.height; row++) {
-                const emptySquare: Square = new Square();
-                this.field[col].push(emptySquare);
+                this.field[col].push(new Square(false));
             }
         }
-        console.log(this.field);
     }
 }
+
+export const MinefieldCreator = (props: {height: number, width: number}): any => {
+    const minefield = new Minefield(props.height,props.width);
+    console.log(props.width);
+    return( 
+        <div className="minefield"> 
+                {minefield.field.map((col) => {
+                    return (
+                        <div>
+                            {col.map(() => {
+                                return <p> M </p>;
+                            })}
+                            
+                        </div>
+                        )
+                    })}
+            </div>
+            )
+    }
+
+
+   
+  

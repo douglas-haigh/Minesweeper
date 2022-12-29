@@ -1,20 +1,17 @@
 import React from 'react';
-
 import './App.css';
+import { MinefieldCreator } from './Minefield';
 
-function App() {
-  return (
-    <div className="App">
-      <header></header>
-      <body>
-      <div className='Minefield'>
-        <App></App>
-        <div className='square hidden'> hello </div>
-        <div className='square hidden'> mine </div>
-      </div>
-      </body>
+
+
+export default function App(): any {
+  return ( 
+    <div>
+      <MinefieldCreator 
+        height={9} 
+        width={9} 
+        /> 
     </div>
-  );
+  )
 }
 
-export default App;
