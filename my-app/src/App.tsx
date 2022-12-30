@@ -1,13 +1,13 @@
 import React from 'react';
 import './App.css';
-import { Minefield, RenderMinefield } from './Minesweeper';
+import { Minefield } from './Minesweeper';
 
 
 export default function App(): any {
   return ( 
     <div>
-      <RenderMinefield
-        minefield={new Minefield(9,9,4)}
+      <Minefield
+        height={9} width={9} numMines={10}
         /> 
     </div>
   )

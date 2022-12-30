@@ -2,6 +2,14 @@
 import React from "react";
 import { getRandomCoordinates } from "./getRandomCoordinates";
 
+
+interface MinefieldProps { 
+    height: number;
+    width: number;
+    numMines: number;
+}
+
+
 function range(start:number, end:number):number[] { 
     let ans = [];
     for (let i=start; i < end; i++ ) {
@@ -33,7 +41,7 @@ export class Square {
     }
 }
 
-export class Minefield {
+export class Minefield extends React.Component<MinefieldProps>{
     height: number;
     width: number;
     mines: number;
@@ -41,12 +49,12 @@ export class Minefield {
     // edges: Square[] = [];
     // corners: Square[] = [this.field[0][0]];
 
-
-    constructor(pHeight:number, pWidth: number, pMines:number) { 
+    constructor(props: MinefieldProps) { 
+        super(props);
         console.log("constructing");
-        this.height = pHeight;
-        this.width = pWidth; 
-        this.mines = pMines;
+        this.height = this.props.height;
+        this.width = this.props.width 
+        this.mines = this.props.numMines;
         for (let col = 0; col < this.width; col++) {
             this.field.push([]);
             for (let row = 0; row < this.height; row++) {
@@ -54,7 +62,6 @@ export class Minefield {
             }
         }
         const mineLocations: number[][] = getRandomCoordinates(this.field, this.mines);
-        console.log(getRandomCoordinates(this.field,this.mines));
         for (let coordinate of mineLocations) {
             this.field[coordinate[0]][coordinate[1]].plantBomb(); 
             console.log("bomb planted at" + coordinate)
@@ -115,26 +122,23 @@ export class Minefield {
     //     }
     //     else { console.log("phew") }
     // }
-}
-
-export const RenderMinefield = ({minefield}: {minefield: Minefield}) => {
-    return  (
-        <div className="minefield"> 
-            {minefield.field.map((col) => {
-                return (
-                    <div>
-                        {col.map((row) => {
-                            const coordinate: number[] = [minefield.field.indexOf(col),col.indexOf(row)];
-                            const id: string = coordinate.toString();
-                            return (
-                                <button id={id} className="square-hidden" onClick={() => minefield.handleClick(coordinate)}>  </button>
-                            )
-                        })}
-                    </div>
-                    )
-                })}
-        </div>
-    ) 
+    render() {
+        return (
+            <div className="minefield"> 
+                {this.field.map((col) => {
+                    return (
+                        <div>
+                            {col.map((row) => {
+                                const coordinate: number[] = [this.field.indexOf(col),col.indexOf(row)];
+                                const id: string = coordinate.toString();
+                                return (
+                                    <button id={id} className="square-hidden" onClick={() => this.handleClick(coordinate)}>  </button>
+                                )
+                            })}
+                        </div>
+                        )
+                    })}
+            </div>)}
 }
 
 
