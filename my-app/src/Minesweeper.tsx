@@ -1,5 +1,6 @@
 // import Mine 
 import React from "react";
+import { getRandomCoordinates } from "./getRandomCoordinates";
 
 function range(start:number, end:number):number[] { 
     let ans = [];
@@ -42,6 +43,7 @@ export class Minefield {
 
 
     constructor(pHeight:number, pWidth: number, pMines:number) { 
+        console.log("constructing");
         this.height = pHeight;
         this.width = pWidth; 
         this.mines = pMines;
@@ -51,17 +53,12 @@ export class Minefield {
                 this.field[col].push(new Square(false));
             }
         }
-        // this.corners.push(this.field[0][this.height], this.field[this.width][0], this.field[this.width][this.height]);
-        // for (let sq of this.field[0]) {
-        //     this.edges.push(sq)
-        // } 
-        // for (let sq of this.field[this.width]) {
-        //     this.edges.push(sq)
-        // } 
-        // for (let i=0;i<this.width;i++) {
-        //     this.edges.push(this.field[i][0]);
-        //     this.edges.push(this.field[i][this.height]);
-        // }
+        const mineLocations: number[][] = getRandomCoordinates(this.field, this.mines);
+        console.log(getRandomCoordinates(this.field,this.mines));
+        for (let coordinate of mineLocations) {
+            this.field[coordinate[0]][coordinate[1]].plantBomb(); 
+            console.log("bomb planted at" + coordinate)
+        }
     }
 
     getAdjacentSquares(squareNumber: number[]): Square[] { 
@@ -104,15 +101,20 @@ export class Minefield {
           return adjacentSquares;
     }
 
-    revealSquare(squareNumber:number[]): void {
-        // const squareElement:HTMLElement = document.getElementById(squareNumber.toString());
-        const square:Square = this.field[squareNumber[0]][squareNumber[1]];
-        square.reveal();
-        if (square.hasBomb) { 
-            console.log("you hit a bomb!");
-        }
-        else { console.log("phew") }
+    handleClick(coordinate:number[]) {
+        console.log(coordinate);
+        const square: Square = this.field[coordinate[0]][coordinate[1]];
+        if (square.hasBomb) { console.log('Boom')};
     }
+    // revealSquare(squareNumber:number[]): void {
+    //     // const squareElement:HTMLElement = document.getElementById(squareNumber.toString());
+    //     const square:Square = this.field[squareNumber[0]][squareNumber[1]];
+    //     square.reveal();
+    //     if (square.hasBomb) { 
+    //         console.log("you hit a bomb!");
+    //     }
+    //     else { console.log("phew") }
+    // }
 }
 
 export const RenderMinefield = ({minefield}: {minefield: Minefield}) => {
@@ -125,7 +127,7 @@ export const RenderMinefield = ({minefield}: {minefield: Minefield}) => {
                             const coordinate: number[] = [minefield.field.indexOf(col),col.indexOf(row)];
                             const id: string = coordinate.toString();
                             return (
-                                <button id={id} className="square-hidden" onClick={() => handleClick(coordinate)}>  </button>
+                                <button id={id} className="square-hidden" onClick={() => minefield.handleClick(coordinate)}>  </button>
                             )
                         })}
                     </div>
@@ -135,9 +137,8 @@ export const RenderMinefield = ({minefield}: {minefield: Minefield}) => {
     ) 
 }
 
-function handleClick(sq:number[]) {
-    console.log(sq);
-}
+
+
 
 
 
