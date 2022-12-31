@@ -47,7 +47,7 @@ export class Square{
         return this._position;
     }
 
-    getElement() {
+    getElement():HTMLElement | null {
         return document.getElementById(this.position.toString());
     }
 
@@ -78,9 +78,9 @@ export class Minefield extends React.Component<MinefieldProps>{
         }
     }
 
-    getAdjacentSquares(squareNumber: number[]): Square[] { 
-        const col = squareNumber[0];
-        const row = squareNumber[1];
+    getAdjacentSquares(coordinate: number[]): Square[] { 
+        const row = coordinate[0];
+        const col = coordinate[1];
     
         let adjacentSquares: Square[] = [];
         
@@ -115,7 +115,33 @@ export class Minefield extends React.Component<MinefieldProps>{
           if (row < this.field.length - 1 && col < this.field[row].length - 1) {
             adjacentSquares.push(this.field[row + 1][col + 1]);
           }
+          
           return adjacentSquares;
+    }
+    isNearBomb(coordinate:number[]):boolean {
+        const adjacentSquares = this.getAdjacentSquares(coordinate);
+        for (let square of adjacentSquares) {
+            if (square.hasBomb) return true
+        }
+        return false
+    }
+
+    getAdjacentBombNumber(coordinate: number[]): number { 
+        let bombCount = 0;
+        const adjacentSquares: Square[] = this.getAdjacentSquares(coordinate);
+
+        for (let sq of adjacentSquares) {
+            if (sq.hasBomb) bombCount ++ 
+        }
+        return bombCount
+    }
+
+    colorAdjacentSquares(coordinate:number[]) {
+        const adjacentSquares = this.getAdjacentSquares(coordinate);
+        for (let sq of adjacentSquares) {
+            const element = sq.getElement();
+            element != null ? element.style.backgroundColor = 'blue' : console.log('element not found');
+        }
     }
 
     handleClick(coordinate:number[]) {
@@ -128,28 +154,41 @@ export class Minefield extends React.Component<MinefieldProps>{
                 this.revealBomb(square);
                 // bombSquareLogic();
             }
+            else if (this.isNearBomb(coordinate)) {
+                this.revealNumber(square);
+                //nearBombLogic();
+            }
             else if (!square.hasBomb) {
                 this.revealSafe(square);
                 // safeSquarelogic();
             }
         }
     }
+
+    handleClick2(coordinate:number[]) { 
+        console.log(coordinate);
+        this.colorAdjacentSquares(coordinate);
+    }
+
+
+    
 // maybe move the revealBomb and revealSquare methods into Square class ??
     revealBomb(square:Square) {
         const element:HTMLElement | null = square.getElement();
-        element != null ? element.style.backgroundColor = 'red': console.log('element with id' + square.position.toString() +  'not found');
+        element != null ? element.style.backgroundColor = 'red': console.log('null element error');
         console.log('Boom');
     }
 
-    // revealNumber(coordinate:number[], number:number) {
-    //     const squareElement: any = document.getElementById(coordinate.toString());
-    //     squareElement.style.backgroundcolor = 'yellow';
-    //     console.log('you are close to' + number + 'bombs');
-    // }
+    revealNumber(square:Square) {
+        const element = square.getElement();
+        const bombNumber = this.getAdjacentBombNumber(square.position);
+        element != null ? element.style.backgroundColor = 'yellow' : console.log('null element error');
+        console.log('you are close to' + bombNumber + 'bombs');
+    }
 
     revealSafe(square:Square) {
         const element:HTMLElement | null = square.getElement();
-        element != null ? element.style.backgroundColor = 'green' : console.log('error');
+        element != null ? element.style.backgroundColor = 'green' : console.log('null element error')
     }
 
     render() {
@@ -161,7 +200,6 @@ export class Minefield extends React.Component<MinefieldProps>{
                             {col.map((row) => {
                                 const coordinate: number[] = [this.field.indexOf(col),col.indexOf(row)];
                                 const id: string = coordinate.toString();
-                                console.log('id = '+ id);
                                 return (
                                     <button id={id} className="square-hidden" onClick={() => this.handleClick(coordinate)}>  </button>
                                 )
