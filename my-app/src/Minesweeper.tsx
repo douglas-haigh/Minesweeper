@@ -1,5 +1,5 @@
 // import Mine 
-import React from "react";
+import React, { useState } from "react";
 import { getRandomCoordinates } from "./getRandomCoordinates";
 
 
@@ -18,12 +18,15 @@ function range(start:number, end:number):number[] {
     return ans;
 };
 
-export class Square {  
-    private _hasBomb: boolean;
+export class Square{  
+    private _hasBomb: boolean = false;
     private _hasRevealed: boolean = false;
+    private _position: number[];
+    
+    constructor(pPosition:number[]) { 
+        this._position = pPosition;
+        console.log(this.position.toString())
 
-    constructor(pHasBomb: boolean) { 
-        this._hasBomb = pHasBomb;
     }
 
     get hasBomb(): boolean { 
@@ -39,6 +42,15 @@ export class Square {
     reveal(): void { 
         this._hasRevealed = true;
     }
+
+    get position(): number[] {
+        return this._position;
+    }
+
+    getElement() {
+        return document.getElementById(this.position.toString());
+    }
+
 }
 
 export class Minefield extends React.Component<MinefieldProps>{
@@ -46,8 +58,6 @@ export class Minefield extends React.Component<MinefieldProps>{
     width: number;
     mines: number;
     field: Square[][] = [];
-    // edges: Square[] = [];
-    // corners: Square[] = [this.field[0][0]];
 
     constructor(props: MinefieldProps) { 
         super(props);
@@ -58,7 +68,7 @@ export class Minefield extends React.Component<MinefieldProps>{
         for (let col = 0; col < this.width; col++) {
             this.field.push([]);
             for (let row = 0; row < this.height; row++) {
-                this.field[col].push(new Square(false));
+                this.field[col].push(new Square([col,row]));
             }
         }
         const mineLocations: number[][] = getRandomCoordinates(this.field, this.mines);
@@ -111,17 +121,37 @@ export class Minefield extends React.Component<MinefieldProps>{
     handleClick(coordinate:number[]) {
         console.log(coordinate);
         const square: Square = this.field[coordinate[0]][coordinate[1]];
-        if (square.hasBomb) { console.log('Boom')};
+        // square.element.style.backgroundColor = 'blue';
+        if (!square.hasRevealed) {
+            square.reveal();
+            if (square.hasBomb) {
+                this.revealBomb(square);
+                // bombSquareLogic();
+            }
+            else if (!square.hasBomb) {
+                this.revealSafe(square);
+                // safeSquarelogic();
+            }
+        }
     }
-    // revealSquare(squareNumber:number[]): void {
-    //     // const squareElement:HTMLElement = document.getElementById(squareNumber.toString());
-    //     const square:Square = this.field[squareNumber[0]][squareNumber[1]];
-    //     square.reveal();
-    //     if (square.hasBomb) { 
-    //         console.log("you hit a bomb!");
-    //     }
-    //     else { console.log("phew") }
+// maybe move the revealBomb and revealSquare methods into Square class ??
+    revealBomb(square:Square) {
+        const element:HTMLElement | null = square.getElement();
+        element != null ? element.style.backgroundColor = 'red': console.log('element with id' + square.position.toString() +  'not found');
+        console.log('Boom');
+    }
+
+    // revealNumber(coordinate:number[], number:number) {
+    //     const squareElement: any = document.getElementById(coordinate.toString());
+    //     squareElement.style.backgroundcolor = 'yellow';
+    //     console.log('you are close to' + number + 'bombs');
     // }
+
+    revealSafe(square:Square) {
+        const element:HTMLElement | null = square.getElement();
+        element != null ? element.style.backgroundColor = 'green' : console.log('error');
+    }
+
     render() {
         return (
             <div className="minefield"> 
@@ -131,6 +161,7 @@ export class Minefield extends React.Component<MinefieldProps>{
                             {col.map((row) => {
                                 const coordinate: number[] = [this.field.indexOf(col),col.indexOf(row)];
                                 const id: string = coordinate.toString();
+                                console.log('id = '+ id);
                                 return (
                                     <button id={id} className="square-hidden" onClick={() => this.handleClick(coordinate)}>  </button>
                                 )
