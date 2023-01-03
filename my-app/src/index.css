@@ -10,8 +10,8 @@ body {
 
 .minefield { 
   display: grid;
-  grid-template-columns: repeat(9, 30px);
-  grid-template-rows: repeat(9, 30px);
+  /* grid-template-columns: repeat(9, 30px); */
+  /* grid-template-rows: repeat(9, 30px); */
 }
 
 .square-hidden { 
@@ -28,5 +28,10 @@ body {
   flex-direction: column;
   justify-content: center;
 }
+
+.square-bomb { 
+
+
+  }
 
 

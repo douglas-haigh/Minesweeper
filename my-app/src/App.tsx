@@ -7,7 +7,7 @@ export default function App(): any {
   return ( 
     <div>
       <Minefield
-        height={9} width={9} numMines={10}
+        height={9} width={8} numMines={10}
         /> 
     </div>
   )

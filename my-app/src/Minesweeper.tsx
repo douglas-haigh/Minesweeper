@@ -1,6 +1,7 @@
 // import Mine 
 import React from "react";
 import { getRandomCoordinates } from "./getRandomCoordinates";
+import {Square} from "./Square"
 
 
 interface MinefieldProps { 
@@ -9,60 +10,16 @@ interface MinefieldProps {
     numMines: number;
 }
 
-
-function range(start:number, end:number):number[] { 
-    let ans = [];
-    for (let i=start; i < end; i++ ) {
-        ans.push(i);
-    }
-    return ans;
-};
-
-export class Square{  
-    private _hasBomb: boolean = false;
-    private _hasRevealed: boolean = false;
-    private _position: number[];
-    
-    constructor(pPosition:number[]) { 
-        this._position = pPosition;
-        console.log(this.position.toString())
-
-    }
-
-    get hasBomb(): boolean { 
-        return this._hasBomb;
-    }
-    plantBomb(): void {
-        this._hasBomb = true;
-    }
-
-    get hasRevealed(): boolean {
-        return this._hasRevealed;
-    }
-    reveal(): void { 
-        this._hasRevealed = true;
-    }
-
-    get position(): number[] {
-        return this._position;
-    }
-
-    getElement():HTMLElement | null {
-        return document.getElementById(this.position.toString());
-    }
-
-}
-
 export class Minefield extends React.Component<MinefieldProps>{
     height: number;
     width: number;
     mines: number;
     field: Square[][] = [];
     gameOver: boolean = false;
+    style: React.CSSProperties | undefined;
 
     constructor(props: MinefieldProps) { 
         super(props);
-        console.log("constructing");
         this.height = this.props.height;
         this.width = this.props.width 
         this.mines = this.props.numMines;
@@ -77,6 +34,12 @@ export class Minefield extends React.Component<MinefieldProps>{
             this.field[coordinate[0]][coordinate[1]].plantBomb(); 
             console.log("bomb planted at" + coordinate)
         }
+        this.style = {
+            display: `grid`,
+            gridTemplateColumns: `repeat(${this.width}, 30px)`,
+            gridTemplateRows: `repeat(${this.height}, 30px)`,
+            justifyContent: `center`
+        };
     }
 
     getAdjacentSquares(coordinate: number[]): Square[] { 
@@ -119,6 +82,32 @@ export class Minefield extends React.Component<MinefieldProps>{
           
           return adjacentSquares;
     }
+
+    getAdjacentUnrevealedSquares(coordinate:number[]): Square[] { 
+
+        const adjacentSquares = this.getAdjacentSquares(coordinate);
+        const unrevealedSquares: Square[] = [];
+
+        for (let sq of adjacentSquares) {
+            if (sq.hasRevealed === false) { 
+                unrevealedSquares.push(sq);
+            }
+        }
+        return unrevealedSquares;
+    }
+
+
+    getAdjacentSafeSquares(coordinate:number[]): Square[] { 
+        const adjacentSquares = this.getAdjacentUnrevealedSquares(coordinate);
+        const safeSquares: Square[] = [];
+        for (let sq of adjacentSquares) {
+            if (!this.isNearBomb(coordinate)) { 
+                safeSquares.push(sq);
+            }
+        }
+        return safeSquares;
+    }
+
     isNearBomb(coordinate:number[]):boolean {
         const adjacentSquares = this.getAdjacentSquares(coordinate);
         for (let square of adjacentSquares) {
@@ -138,68 +127,78 @@ export class Minefield extends React.Component<MinefieldProps>{
     }
 
     colorAdjacentSquares(coordinate:number[]) {
-        const adjacentSquares = this.getAdjacentSquares(coordinate);
+        const adjacentSquares = this.getAdjacentSafeSquares(coordinate);
+        const colors = ['blue', 'red'];
+        const randColor = colors[Math.floor(Math.random()*2)]
         for (let sq of adjacentSquares) {
             const element = sq.getElement();
-            element != null ? element.style.backgroundColor = 'blue' : console.log('element not found');
+            element != null ? element.style.backgroundColor = randColor : console.log('element not found');
+            sq.reveal();
         }
     }
 
-    handleClick(coordinate:number[]) {
-        if (!this.gameOver) {
-            console.log(coordinate);
-            const square: Square = this.field[coordinate[0]][coordinate[1]];
-            // square.element.style.backgroundColor = 'blue';
-            if (!square.hasRevealed) {
-                square.reveal();
-                if (square.hasBomb) {
-                    this.revealBomb(square);
-                    this.gameOver = true;
-                    // bombSquareLogic();
-                }
-                else if (this.isNearBomb(coordinate)) {
-                    this.revealNumber(square);
-                    //nearBombLogic();
-                }
+    revealSquare(sq:Square) { 
+        const coordinate = sq.position;
+
+        if (sq.hasBomb) { 
+            sq.revealBomb();
+        }
+        else if (this.isNearBomb(coordinate)) {
+            sq.revealNumber(this.getAdjacentBombNumber(coordinate));
+        }
+        else if (!this.isNearBomb(coordinate)) {
+            sq.revealSafe();
+        }
+    }
+
+
+    handleClick2(coordinate:number[]) { 
+        this.colorAdjacentSquares(coordinate);
+    }
+
+    //  above 2 functions are for testing purposes.
+
+    revealSafeSquares(sq: Square) {
+        const coordinate = sq.position;
+        this.revealSquare(sq);
+        if (!this.isNearBomb(coordinate)) { 
+            const adjacentSquares = this.getAdjacentUnrevealedSquares(coordinate);
+            for (let square of adjacentSquares) { 
+                if (!this.isNearBomb(coordinate)) {
+                    this.revealSafeSquares(square);
+                    }
                 else if (!square.hasBomb) {
-                    this.revealSafe(square);
-                    // safeSquarelogic();
+                    this.revealSquare(square);
                 }
             }
         }
     }
 
-    handleClick2(coordinate:number[]) { 
-        console.log(coordinate);
-        this.colorAdjacentSquares(coordinate);
-    }
+    handleClick(coordinate:number[]) {
+        if (!this.gameOver) {
+            const square: Square = this.field[coordinate[0]][coordinate[1]];
 
+            if (!square.hasRevealed) {
+                square.reveal();
+                if (square.hasBomb) {
+                    square.revealBomb();
+                    this.gameOver = true;
+                }
 
-    
-// maybe move the revealBomb and revealSquare methods into Square class ??
-    revealBomb(square:Square) {
-        const element:HTMLElement | null = square.getElement();
-        element != null ? element.style.backgroundColor = 'red': console.log('null element error');
-        console.log('Boom');
-    }
-
-    revealNumber(square:Square) {
-        const element = square.getElement();
-        const bombNumber = this.getAdjacentBombNumber(square.position);
-        element != null ? element.style.backgroundColor = 'yellow' : console.log('null element error');
-        element != null ? element.textContent = bombNumber.toString(): console.log('null element');
-        console.log('you are close to' + bombNumber + 'bombs');
-
-    }
-
-    revealSafe(square:Square) {
-        const element:HTMLElement | null = square.getElement();
-        element != null ? element.style.backgroundColor = 'green' : console.log('null element error')
+                else if (this.isNearBomb(coordinate)) {
+                    const bombNumber = this.getAdjacentBombNumber(square.position);
+                    square.revealNumber(bombNumber);
+                }
+                else if (!square.hasBomb) {
+                    this.revealSafeSquares(square);                   
+                }
+            }
+        }
     }
 
     render() {
         return (
-            <div className="minefield"> 
+            <div className="minefield" style={this.style}> 
                 {this.field.map((col) => {
                     return (
                         <div>

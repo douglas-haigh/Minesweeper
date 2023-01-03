@@ -10,7 +10,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <h1> Minesweeper </h1>
+    <h1> Dougie sweeper </h1>
     <App/>
     <p>Thanks for playing</p>
   </React.StrictMode>
