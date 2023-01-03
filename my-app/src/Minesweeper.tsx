@@ -1,5 +1,5 @@
 // import Mine 
-import React, { useState } from "react";
+import React from "react";
 import { getRandomCoordinates } from "./getRandomCoordinates";
 
 
@@ -58,6 +58,7 @@ export class Minefield extends React.Component<MinefieldProps>{
     width: number;
     mines: number;
     field: Square[][] = [];
+    gameOver: boolean = false;
 
     constructor(props: MinefieldProps) { 
         super(props);
@@ -145,22 +146,25 @@ export class Minefield extends React.Component<MinefieldProps>{
     }
 
     handleClick(coordinate:number[]) {
-        console.log(coordinate);
-        const square: Square = this.field[coordinate[0]][coordinate[1]];
-        // square.element.style.backgroundColor = 'blue';
-        if (!square.hasRevealed) {
-            square.reveal();
-            if (square.hasBomb) {
-                this.revealBomb(square);
-                // bombSquareLogic();
-            }
-            else if (this.isNearBomb(coordinate)) {
-                this.revealNumber(square);
-                //nearBombLogic();
-            }
-            else if (!square.hasBomb) {
-                this.revealSafe(square);
-                // safeSquarelogic();
+        if (!this.gameOver) {
+            console.log(coordinate);
+            const square: Square = this.field[coordinate[0]][coordinate[1]];
+            // square.element.style.backgroundColor = 'blue';
+            if (!square.hasRevealed) {
+                square.reveal();
+                if (square.hasBomb) {
+                    this.revealBomb(square);
+                    this.gameOver = true;
+                    // bombSquareLogic();
+                }
+                else if (this.isNearBomb(coordinate)) {
+                    this.revealNumber(square);
+                    //nearBombLogic();
+                }
+                else if (!square.hasBomb) {
+                    this.revealSafe(square);
+                    // safeSquarelogic();
+                }
             }
         }
     }
@@ -183,7 +187,9 @@ export class Minefield extends React.Component<MinefieldProps>{
         const element = square.getElement();
         const bombNumber = this.getAdjacentBombNumber(square.position);
         element != null ? element.style.backgroundColor = 'yellow' : console.log('null element error');
+        element != null ? element.textContent = bombNumber.toString(): console.log('null element');
         console.log('you are close to' + bombNumber + 'bombs');
+
     }
 
     revealSafe(square:Square) {

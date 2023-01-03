@@ -15,6 +15,8 @@ body {
 }
 
 .square-hidden { 
+  align-items: center;
+  font-size: large;
   background-color: rgba(192, 192, 192, 0.646);
   border-style: solid;
   border-color: black;
