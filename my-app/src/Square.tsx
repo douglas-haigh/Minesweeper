@@ -43,8 +43,6 @@ export class Square{
         const element = this.getElement();
         element != null ? element.style.backgroundColor = 'yellow' : console.log('null element error');
         element != null ? element.textContent = bombNumber.toString(): console.log('null element');
-        console.log('you are close to' + bombNumber + 'bombs');
-
     }
 
     revealSafe() {

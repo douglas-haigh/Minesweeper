@@ -23,6 +23,9 @@ export class Minefield extends React.Component<MinefieldProps>{
         this.height = this.props.height;
         this.width = this.props.width 
         this.mines = this.props.numMines;
+
+        console.log(`constructing minefield w dimensions` + [this.height, this.width])
+
         for (let col = 0; col < this.width; col++) {
             this.field.push([]);
             for (let row = 0; row < this.height; row++) {
@@ -32,7 +35,7 @@ export class Minefield extends React.Component<MinefieldProps>{
         const mineLocations: number[][] = getRandomCoordinates(this.field, this.mines);
         for (let coordinate of mineLocations) {
             this.field[coordinate[0]][coordinate[1]].plantBomb(); 
-            console.log("bomb planted at" + coordinate)
+
         }
         this.style = {
             display: `grid`,

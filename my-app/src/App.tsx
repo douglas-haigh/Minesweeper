@@ -1,14 +1,36 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import './App.css';
-import { Minefield } from './Minesweeper';
-
+import { DifficultyPopup } from './ChooseDifficulty';
+import { Difficulty } from './Difficulty';
+// import { Minefield } from './Minesweeper';
+import { MinefieldFactory} from './MinefieldFactory'
 
 export default function App(): any {
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [difficulty, setDifficulty]= useState<Difficulty>(Difficulty.Medium);
+  
+  const handlePopup = () => {
+    setIsOpen(!isOpen); 
+  }
+
+  // useEffect(() => {setDifficulty(difficulty);}, [difficulty]);
+
+
+  
   return ( 
-    <div>
-      <Minefield
-        height={9} width={8} numMines={10}
+    <div className='App'>
+    
+      <div className='popup'> 
+        <DifficultyPopup 
+          setDifficulty={setDifficulty}
+          handlePopup={handlePopup}
         /> 
+
+      </div>
+  
+      <MinefieldFactory difficulty={difficulty}/> 
+
     </div>
   )
 }
