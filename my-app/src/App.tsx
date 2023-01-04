@@ -7,6 +7,7 @@ import { MinefieldFactory} from './MinefieldFactory'
 
 export default function App(): any {
 
+
   const [isOpen, setIsOpen] = useState(false);
   const [difficulty, setDifficulty]= useState<Difficulty>(Difficulty.Medium);
   

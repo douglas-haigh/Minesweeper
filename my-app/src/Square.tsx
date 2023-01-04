@@ -27,8 +27,8 @@ export class Square{
         return this._position;
     }
 
-    getElement():HTMLElement | null {
-        return document.getElementById(this.position.toString());
+    getElement():HTMLElement{
+        return document.getElementById(this.position.toString())!;
     }
 
     revealBomb() {
@@ -41,13 +41,21 @@ export class Square{
     revealNumber(bombNumber:number) {
         this.reveal();
         const element = this.getElement();
-        element != null ? element.style.backgroundColor = 'yellow' : console.log('null element error');
-        element != null ? element.textContent = bombNumber.toString(): console.log('null element');
+        element.style.backgroundColor = 'yellow'
+        element.textContent = bombNumber.toString();
     }
 
     revealSafe() {
         this.reveal();
         const element:HTMLElement | null = this.getElement();
-        element != null ? element.style.backgroundColor = 'green' : console.log('null element error')
+        element.style.backgroundColor = 'green';
+    }
+
+    clear() { 
+        this._hasBomb = false
+        this._hasRevealed = false
+        const element = this.getElement();
+        // element.style.backgroundColor = 'rgba(192, 192, 1.92, 1 )';
+        // element.textContent = 'p';
     }
 }

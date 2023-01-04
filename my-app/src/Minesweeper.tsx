@@ -45,6 +45,14 @@ export class Minefield extends React.Component<MinefieldProps>{
         };
     }
 
+    clearMinefield() {
+        for (let col of this.field) {
+            for (let sq of col) {
+                sq.clear();
+            }
+        }
+    }
+
     getAdjacentSquares(coordinate: number[]): Square[] { 
         const row = coordinate[0];
         const col = coordinate[1];
